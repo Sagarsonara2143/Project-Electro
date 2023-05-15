@@ -39,4 +39,9 @@ urlpatterns = [
     path('seller-order/',views.seller_order,name='seller-order'),
     path('ajax/validate_email/',views.validate_email,name='validate_email'),
     path('ajax/validate_mobile/',views.validate_mobile,name='validate_mobile'),
+    path('ajax/validate_pwd/',views.validate_pwd,name='validate_pwd'),
 ]
+
+
+
+

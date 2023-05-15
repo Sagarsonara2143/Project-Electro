@@ -30,6 +30,15 @@ def validate_mobile(request):
 	}		
 	return JsonResponse(data)
 
+def validate_pwd(request):
+	pwd=request.GET.get('pwd')
+	cpwd=request.GET.get('cpwd')
+	data={
+		'is_taken': pwd != cpwd
+	}		
+	return JsonResponse(data)
+
+
 def index(request):
 	try:
 		user=User.objects.get(email=request.session['email'])

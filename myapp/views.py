@@ -23,6 +23,13 @@ def validate_email(request):
 	}		
 	return JsonResponse(data)
 
+def validate_mobile(request):
+	mobile=request.GET.get('mobile')
+	data={
+		'is_taken':User.objects.filter(mobile__iexact=mobile).exists()
+	}		
+	return JsonResponse(data)
+
 def index(request):
 	try:
 		user=User.objects.get(email=request.session['email'])

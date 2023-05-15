@@ -38,4 +38,5 @@ urlpatterns = [
     path('myorder/',views.myorder,name='myorder'),
     path('seller-order/',views.seller_order,name='seller-order'),
     path('ajax/validate_email/',views.validate_email,name='validate_email'),
+    path('ajax/validate_mobile/',views.validate_mobile,name='validate_mobile'),
 ]

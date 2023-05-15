@@ -7,6 +7,7 @@ from django.conf import settings
 from django.http import JsonResponse,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.http import JsonResponse
 from django.utils import timezone
 
 
@@ -14,6 +15,13 @@ stripe.api_key = settings.STRIPE_PRIVATE_KEY
 YOUR_DOMAIN = 'http://localhost:8000'
 
 # Create your views here.
+
+def validate_email(request):
+	email=request.GET.get('email')
+	data={
+		'is_taken':User.objects.filter(email__iexact=email).exists()
+	}		
+	return JsonResponse(data)
 
 def index(request):
 	try:
@@ -41,25 +49,29 @@ def signup(request):
 			msg="Email Id is already registered"
 			return render(request,'signup.html',{'msg':msg})
 		except:
-			if request.POST['password']==request.POST['cpassword']:
-				User.objects.create(
-					fname=request.POST['fname'],
-					lname=request.POST['lname'],
-					email=request.POST['email'],
-					mobile=request.POST['mobile'],
-					address=request.POST['address'],
-					city=request.POST['city'],
-					zipcode=request.POST['zipcode'],
-					password=request.POST['password'],
-					profile_pic=request.FILES['profile_pic'],
-					usertype=request.POST['usertype']
-					)
-				msg="User Sign Up Successfully"
-				carts=Cart.objects.filter(user=user,paymemt_status=False)
-				return render(request,'login.html',{'msg':msg,'carts':carts})
-			else:
-				msg="Password and Confirm password does not matched"
-				return render(request,'signup.html',{'msg':msg,'carts':carts})
+			try:
+				User.objects.get(mobile=request.POST['mobile'])	
+				msg="Mobile Number Already Registred"
+				return render(request,'signup.html',{'msg':msg})
+			except:
+				if request.POST['password']==request.POST['cpassword']:
+					User.objects.create(
+						fname=request.POST['fname'],
+						lname=request.POST['lname'],
+						email=request.POST['email'],
+						mobile=request.POST['mobile'],
+						address=request.POST['address'],
+						city=request.POST['city'],
+						zipcode=request.POST['zipcode'],
+						password=request.POST['password'],
+						profile_pic=request.FILES['profile_pic'],
+						usertype=request.POST['usertype']
+						)
+					msg="User Sign Up Successfully"
+					return render(request,'login.html',{'msg':msg})
+				else:
+					msg="Password and Confirm password does not matched"
+					return render(request,'signup.html',{'msg':msg,'carts':carts})
 	else:
 		return render(request,'signup.html')
 
@@ -424,26 +436,26 @@ def checkout(request):
 def create_checkout_session(request):
  #Updated- creating Order object
 
-	amount=int(json.load(request)['post_data'])
-	final_amount=amount * 100
+ amount=int(json.load(request)['post_data'])
+ final_amount=amount * 100
 
-	session=stripe.checkout.Session.create(
-		payment_method_types=['card'],
-		line_items=[{
-		'price_data': {
-		'currency': 'inr',
-		'product_data': {
-		'name': 'Intro to Django Course',
-		},
-		'unit_amount':final_amount,
-		},
-		'quantity': 1,
-		}],
-		mode='payment',
-		success_url=YOUR_DOMAIN + '/success.html',
-		cancel_url=YOUR_DOMAIN + '/cancel.html',
-		)
-	return JsonResponse({'id':session.id})
+ session=stripe.checkout.Session.create(
+	payment_method_types=['card'],
+	line_items=[{
+	'price_data': {
+	'currency': 'inr',
+	'product_data': {
+	'name': 'Intro to Django Course',
+	},
+	'unit_amount':final_amount,
+	},
+	'quantity': 1,
+	}],
+	mode='payment',
+	success_url=YOUR_DOMAIN + '/success.html',
+	cancel_url=YOUR_DOMAIN + '/cancel.html',
+	)
+ return JsonResponse({'id':session.id})
 
 def success(request):
 	user=User.objects.get(email=request.session['email'])

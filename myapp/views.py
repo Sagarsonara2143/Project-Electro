@@ -47,7 +47,12 @@ def index(request):
 		else:
 			products=Product.objects.all()
 			carts=Cart.objects.filter(user=user,paymemt_status=False)
-			return render(request,'index.html',{'products':products,'carts':carts})
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
+			return render(request,'index.html',{'products':products,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 	except:
 		products=Product.objects.all()
 		return render(request,'index.html',{'products':products})
@@ -87,7 +92,7 @@ def signup(request):
 					return render(request,'login.html',{'msg':msg})
 				else:
 					msg="Password and Confirm password does not matched"
-					return render(request,'signup.html',{'msg':msg,'carts':carts})
+					return render(request,'signup.html',{'msg':msg})
 	else:
 		return render(request,'signup.html')
 
@@ -147,22 +152,37 @@ def change_password(request):
 					return render(request,'seller-change-password.html',{'msg':msg})
 				else:
 					carts=Cart.objects.filter(user=user,paymemt_status=False)
+					net_price=0
+					total_qty=0
+					for i in carts:
+						net_price=net_price+i.total_price
+						total_qty=total_qty+i.product_qty
 					msg="New Password & confirm New Password does not matched"
-					return render(request,'change-password.html',{'carts':carts,'msg':msg})	
+					return render(request,'change-password.html',{'carts':carts,'msg':msg,'net_price':net_price,'total_qty':total_qty})	
 		else:
 			if user.usertype=="seller":
 				msg="Incorrect Old Password"
 				return render(request,'seller-change-password.html',{'msg':msg})
 			else:
 				carts=Cart.objects.filter(user=user,paymemt_status=False)
+				net_price=0
+				total_qty=0
+				for i in carts:
+					net_price=net_price+i.total_price
+					total_qty=total_qty+i.product_qty
 				msg="Incorrect Old Password"
-				return render(request,'change-password.html',{'msg':msg,'carts':carts})
+				return render(request,'change-password.html',{'msg':msg,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 	else:
 		if user.usertype=="seller":
 			return render(request,'seller-change-password.html')
 		else:
 			carts=Cart.objects.filter(user=user,paymemt_status=False)
-			return render(request,'change-password.html',{'carts':carts})
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
+			return render(request,'change-password.html',{'carts':carts,'net_price':net_price,'total_qty':total_qty})
 
 def forgot_password(request):
 	if request.method=="POST":
@@ -228,14 +248,24 @@ def profile(request):
 			return render(request,'seller-profile.html',{'user':user,'msg':msg})
 		else:
 			carts=Cart.objects.filter(user=user,paymemt_status=False)
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
 			msg="Profile Updated Successfully"
-			return render(request,'profile.html',{'user':user,'msg':msg,'carts':carts})
+			return render(request,'profile.html',{'user':user,'msg':msg,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 	else:
 		if user.usertype=="seller":
 			return render(request,'seller-profile.html',{'user':user})
 		else:
 			carts=Cart.objects.filter(user=user,paymemt_status=False)
-			return render(request,'profile.html',{'user':user,'carts':carts})
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
+			return render(request,'profile.html',{'user':user,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 
 
 def seller_add_product(request):
@@ -296,8 +326,13 @@ def laptops(request):
 		user=User.objects.get(user=user)
 		if request.session.email():
 			carts=Cart.objects.filter(user=user,paymemt_status=False)
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
 			products=Product.objects.filter(product_cat="Laptop")
-			return render (request,"index.html",{'carts':carts,'products':products})
+			return render (request,"index.html",{'carts':carts,'net_price':net_price,'total_qty':total_qty,'products':products})
 		else:
 			products=Product.objects.filter(product_cat="Laptop")
 			return render (request,"index.html",{'products':products})
@@ -310,9 +345,14 @@ def cameras(request):
 	try:
 		user=User.objects.get(user=user)
 		if request.session.email():
-			carts=Cart.objects.filter(user=user,paymemt_status=False)
 			products=Product.objects.filter(product_cat="Camera")
-			return render (request,"index.html",{'carts':carts,'products':products})
+			carts=Cart.objects.filter(user=user,paymemt_status=False)
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
+			return render (request,"index.html",{'products':products,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 		else:
 			products=Product.objects.filter(product_cat="Camera")
 			return render (request,"index.html",{'products':products})
@@ -324,9 +364,14 @@ def accessories(request):
 	try:
 		user=User.objects.get(user=user)
 		if request.session.email():
-			carts=Cart.objects.filter(user=user,paymemt_status=False)
 			products=Product.objects.filter(product_cat="Accessories")
-			return render (request,"index.html",{'carts':carts,'products':products})
+			carts=Cart.objects.filter(user=user,paymemt_status=False)
+			net_price=0
+			total_qty=0
+			for i in carts:
+				net_price=net_price+i.total_price
+				total_qty=total_qty+i.product_qty
+			return render (request,"index.html",{'products':products,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 		else:
 			products=Product.objects.filter(product_cat="Accessories")
 			return render (request,"index.html",{'products':products})
@@ -352,7 +397,7 @@ def seller_cameras(request):
 
 def product_details(request,pk):
 	user=User.objects.get(email=request.session['email'])
-	carts=Cart.objects.get(user=user)
+	#carts=Cart.objects.get(user=user)
 	wishlist_flag=False
 	cart_flag=False
 	product=Product.objects.get(pk=pk)
@@ -368,14 +413,24 @@ def product_details(request,pk):
 	except:
 		pass
 	carts=Cart.objects.filter(user=user,paymemt_status=False)
-	return render(request,'product-details.html',{'product':product,'wishlist_flag':wishlist_flag,'cart_flag':cart_flag,'carts':carts})
+	net_price=0
+	total_qty=0
+	for i in carts:
+		net_price=net_price+i.total_price
+		total_qty=total_qty+i.product_qty
+	return render (request,"product-details.html",{'products':products,'wishlist_flag':wishlist_flag,'cart_flag':cart_flag,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 
 def wishlist(request):
 	user=User.objects.get(email=request.session['email'])
 	wishlists=Wishlist.objects.filter(user=user)
 	request.session['wishlist_count']=len(wishlists)
 	carts=Cart.objects.filter(user=user,paymemt_status=False)
-	return render(request,'wishlist.html',{'wishlists':wishlists,'carts':carts})
+	net_price=0
+	total_qty=0
+	for i in carts:
+		net_price=net_price+i.total_price
+		total_qty=total_qty+i.product_qty
+	return render(request,'wishlist.html',{'wishlists':wishlists,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 
 
 def add_to_wishlist(request,pk):
@@ -497,7 +552,12 @@ def myorder(request):
 	user=User.objects.get(email=request.session['email'])
 	purchased_carts=Cart.objects.filter(user=user,paymemt_status=True)
 	carts=Cart.objects.filter(user=user,paymemt_status=False)
-	return render(request,'myorder.html',{'purchased_carts':purchased_carts,'carts':carts})
+	net_price=0
+	total_qty=0
+	for i in carts:
+		net_price=net_price+i.total_price
+		total_qty=total_qty+i.product_qty
+	return render(request,'myorder.html',{'purchased_carts':purchased_carts,'carts':carts,'net_price':net_price,'total_qty':total_qty})
 
 def seller_order(request):
 	seller=User.objects.get(email=request.session['email'])
